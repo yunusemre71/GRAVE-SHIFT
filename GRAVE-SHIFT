@@ -1,0 +1,2307 @@
+======================================================================
+GRAVE SHIFT
+PROFESYONEL OYUN TASARIMI, TEKNİK MİMARİ VE ÜRETİM ŞARTNAMESİ
+UNREAL ENGINE 5 | ATMOSFERİK HAYATTA KALMA KORKU OYUNU
+======================================================================
+
+PROJE TALİMATI
+
+Sen bu projede kıdemli bir oyun tasarımcısı, Unreal Engine geliştiricisi,
+çok oyunculu ağ programcısı, 3B çevre sanatçısı, karakter sanatçısı,
+animasyon geliştiricisi, ses tasarımcısı, teknik sanatçı ve QA
+mühendisi sorumluluklarını üstleniyorsun.
+
+Amacın yalnızca kod üretmek veya bir prototipi çalıştırmak değildir.
+Amacın; tutarlı bir oyun tasarımına, sağlam bir teknik mimariye,
+yüksek görsel kaliteye, işlevsel çok oyunculu desteğe ve baştan sona
+oynanabilir bir deneyime sahip olan GRAVE SHIFT oyununu geliştirmektir.
+
+Bu belge hem oyunun tasarım sözleşmesi hem de geliştirme sürecinin
+ana referansıdır.
+
+Bütün gereksinimleri tek bir işlemde gerçekleştirmeye çalışma.
+Projeyi incele, bağımlılıkları doğrula, görevleri sırayla uygula,
+test et ve doğrulanmış ilerlemeyi koru.
+
+Kod oluşturulmasını, dosya oluşturulmasını veya editörün açılmasını
+tek başına tamamlanma kanıtı olarak kabul etme.
+
+Bir özellik ancak gereksinimleri karşılıyor, diğer sistemlerle
+uyumlu çalışıyor ve uygun testlerle doğrulanıyorsa tamamlanmış sayılır.
+
+
+======================================================================
+BÖLÜM 1 — OYUNUN KİMLİĞİ VE TASARIM HEDEFİ
+======================================================================
+
+Oyun adı: GRAVE SHIFT
+
+Tür:
+- Atmosferik hayatta kalma korkusu.
+- Birinci şahıs keşif.
+- Kaynak yönetimi.
+- Tehditlerden kaçınma ve saklanma.
+- İş birliğine dayalı çok oyunculu oynanış.
+- Çevresel hikâye anlatımı.
+- Gündüz hazırlık ve gece keşif döngüsü.
+
+Motor: Projede kurulu ve desteklenen Unreal Engine sürümü.
+Öncelik: Mevcut projenin motor sürümünü doğrula. Sürüm yükseltmesini
+kullanıcı onayı ve teknik gereklilik olmadan gerçekleştirme.
+
+Platform hedefi: Öncelikle Windows PC.
+
+Oynanış bakış açısı: Birinci şahıs.
+
+Çok oyunculu yaklaşım: Host tarafından yönetilen oturum ve sunucu
+otoritesine dayalı oyun mantığı. Kullanılabilir oturum altyapısına
+göre çevrim içi bağlantı yöntemi doğrulanmalıdır.
+
+Ana tasarım hedefi:
+
+Oyuncular, terk edilmiş ve tehlikeli bir şehirde bulunan bir
+sığınaktan hareket ederek her gece belirlenmiş tek bir binayı
+araştırır, gerekli kaynakları ve hedef nesnelerini bulur, tehditle
+başa çıkar, elde ettiklerini geri getirir ve sonraki gün için
+hazırlık yapar.
+
+Oyun korkuyu yalnızca yaratıkların oyuncuyu kovalamasıyla üretmez.
+Karanlık, belirsizlik, sınırlı envanter, seslerin kaynağını
+anlayamama, rota seçimi, ekip arkadaşlarıyla koordinasyon ve
+gece boyunca artan risk temel korku araçlarıdır.
+
+Oyuncu her zaman kendisini güvende hissetmemelidir. Bununla birlikte
+tehlikeler rastgele ve haksız olmamalıdır. Oyuncunun öğrendiği
+kurallar, verdiği kararlar ve gösterdiği dikkat hayatta kalma
+olasılığını etkilemelidir.
+
+
+======================================================================
+BÖLÜM 2 — TASARIM İLKELERİ VE ÖNCELİKLER
+======================================================================
+
+Bütün geliştirme kararları aşağıdaki öncelik sırasına göre alınır.
+
+1. Oynanabilirlik.
+2. Temel oyun döngüsünün tutarlılığı.
+3. Çok oyunculu güvenilirlik.
+4. Oyuncu kararlarının anlamlı olması.
+5. Korku atmosferi ve ses tasarımı.
+6. Görsel kalite ve çevresel ayrıntı.
+7. Performans ve kararlılık.
+8. İçerik çeşitliliği ve genişletilebilirlik.
+
+Bu sıralama görsel kalitenin önemsiz olduğu anlamına gelmez.
+Görsel kalite zorunlu bir hedeftir. Ancak çalışmayan bir oyun
+mekaniğini güzel bir modelin arkasına saklama.
+
+Aşağıdaki ilkeler zorunludur:
+
+- Her gece yalnızca bir hedef bina bulunur.
+- Diğer binaların girişleri kapalıdır.
+- Sığınağın duvarındaki şehir haritası kalıcıdır.
+- Haritanın taşınabilir kopyası envanterde yer kaplar.
+- Envanterin temel kapasitesi dört yuvadır.
+- Harita kopyası taşınıyorsa üç yuva eşya taşımaya kalır.
+- Şehirdeki hedef binalar belirlenmiş ilerleme sırasına göre açılır.
+- Oyuncu, ana oynanışta silah kullanmaya dayalı bir sisteme
+  zorlanmaz. Kaynak tasarımda bulunmayan silahlar eklenmez.
+- Yaratıklardan kaçma, saklanma ve çevreyi değerlendirme temel
+  korku mekanikleri olarak korunur.
+- Oyuncunun bilmediği bir bilgiyi arayüz gereksiz yere açığa çıkarmaz.
+- Oyuncu için önemli nesneler, gerekli olduğunda görsel ve işitsel
+  ipuçlarıyla anlaşılabilir hâle getirilir.
+- Çok oyunculu oyunda ortak dünya durumu tutarlı olmalıdır.
+- Gerçekleştirilemeyen özellikler tamamlanmış gibi gösterilmez.
+
+
+======================================================================
+BÖLÜM 3 — OYUNUN TEMEL DÖNGÜSÜ
+======================================================================
+
+Oyun, birbirine bağlı gündüz hazırlığı, gece keşfi ve gün sonu
+değerlendirmesinden oluşur.
+
+AŞAMA A: SIĞINAKTA HAZIRLIK
+
+Oyuncular sığınağa gelir.
+
+Oyuncular:
+- Duvar haritasını inceler.
+- İsterlerse haritanın taşınabilir kopyasını alır.
+- Envanterlerini düzenler.
+- Mevcut kaynaklarını kontrol eder.
+- Bir sonraki hedef binayı öğrenir.
+- Gerekli eşyaları seçer.
+- Takım arkadaşlarıyla rota ve görev paylaşımı yapar.
+
+Hazırlık aşaması, oyuncunun bir sonraki geceye ilişkin kararlar
+almasını sağlamalıdır.
+
+Hazırlık süresinin bitişi tek bir merkezi oyun durumu tarafından
+yönetilir. Her istemcinin kendi yerel zamanlayıcısı ayrı bir oyun
+başlangıcı üretmemelidir.
+
+AŞAMA B: GECE BAŞLANGICI
+
+Gece başladığında:
+- Aktif hedef bina kesinleşir.
+- Hedef bina haritada gösterilir.
+- Diğer binaların girişleri kapalı kalır.
+- Dış ortam aydınlatması ve ses atmosferi gece durumuna geçer.
+- Geceye ait oyun kuralları etkinleşir.
+- Yaratıkların davranışları ilgili durum makinesine göre başlar.
+- Oyuncular hedef binaya gitmek üzere sığınaktan ayrılır.
+
+Gece başladıktan sonra hedef bina keyfî olarak değiştirilmez.
+Hedefin değiştirilmesi gerekiyorsa bu yalnızca açıkça tanımlanmış
+bir görev başarısızlığı veya oyun durumu geçişi üzerinden yapılır.
+
+AŞAMA C: HEDEF BİNAYA YOLCULUK
+
+Oyuncular:
+- Şehirdeki rotalarını takip eder.
+- Çevresel ipuçlarını değerlendirir.
+- Ses kaynaklarını dinler.
+- Tehlikeli bölgelerden kaçınır.
+- Takım arkadaşlarıyla iletişim kurar.
+- Gerekirse saklanır veya alternatif bir yol kullanır.
+
+Şehir yalnızca görsel bir koridor gibi hissettirilmemelidir.
+Çevresel düzen, görüş mesafesi, ses yalıtımı, engeller ve
+aydınlatma oyuncunun kararlarını etkilemelidir.
+
+AŞAMA D: BİNAYI ARAŞTIRMA
+
+Her gece yalnızca bir hedef bina vardır.
+
+Oyuncular:
+- Binaya giriş yapar.
+- Odaları araştırır.
+- Etkileşimli nesneleri bulur.
+- Görev için gerekli nesneleri veya kaynakları toplar.
+- Çevresel hikâye anlatımını keşfeder.
+- Yaratıkların davranışlarını değerlendirir.
+- Envanter kapasitelerini yönetir.
+- Gerekli hedefleri tamamlamaya çalışır.
+
+Bina içinde gereksiz, birbirinin aynısı odalar üretme.
+Her odanın görsel, işlevsel veya anlatısal bir amacı olmalıdır.
+
+AŞAMA E: GERİ DÖNÜŞ
+
+Oyuncular topladıkları eşyalarla sığınağa dönmeye çalışır.
+
+Geri dönüş, giriş yolunun basitçe tersine yürünmesinden ibaret
+olmamalıdır. Gece koşulları, yaratıkların konumu ve oyuncuların
+taşıdığı eşyalar geri dönüş kararlarını etkileyebilmelidir.
+
+AŞAMA F: GÜN SONU
+
+Sığınağa dönüldüğünde:
+- Teslim edilebilir eşyalar değerlendirilir.
+- Görev ilerlemesi güncellenir.
+- Ekonomik sonuç hesaplanır.
+- Başarı ve başarısızlık koşulları değerlendirilir.
+- Oyuncuların durumu güncellenir.
+- Gerekli kayıt işlemi gerçekleştirilir.
+- Sonraki günün hazırlık aşaması başlar.
+
+Aynı görev ödülü aynı oyun durumu için iki defa verilmemelidir.
+Gün sonu hesaplaması tekrar çağrıldığında yinelenen ödeme üretmemelidir.
+
+
+======================================================================
+BÖLÜM 4 — ŞEHİR TASARIMI VE BİNA İLERLEMESİ
+======================================================================
+
+Şehir, terk edilmiş, karanlık, tehlikeli ve araştırılmaya değer
+bir yerleşim bölgesi olarak tasarlanmalıdır.
+
+Şehirde:
+- Birden fazla bina bulunur.
+- Sokaklar ve geçiş alanları bulunur.
+- Görüşü sınırlayan çevresel öğeler bulunur.
+- Oyuncunun saklanabileceği yerler bulunabilir.
+- Çevresel hikâye anlatımı bulunur.
+- Hedef binaya ulaşmak için okunabilir bir rota bulunur.
+- Sığınak ile hedef bina arasında anlaşılır bir mekânsal ilişki olur.
+
+BİNA AÇILMA KURALI
+
+Her gece yalnızca bir bina hedef olarak belirlenir.
+
+Diğer binaların girişleri:
+- Tahta parçalarıyla kapatılmış olmalıdır.
+- Fiziksel olarak kapalı görünmelidir.
+- Normal oyuncu etkileşimiyle açılamamalıdır.
+- İçerideki alanın yanlışlıkla erişilebilir olmasını engellemelidir.
+
+Kapalı binaların girişlerinde yalnızca düz bir duvar kullanmak
+yerine uygun kapı geometrisi, kırık tahtalar, çiviler, kir,
+yıpranma ve çevreye uygun malzemeler kullanılmalıdır.
+
+Kapalı binalar uzaktan hedef bina ile karıştırılmamalıdır.
+
+Hedef bina:
+- Görsel ipuçlarıyla ayırt edilebilir olmalıdır.
+- Haritada doğru biçimde gösterilmelidir.
+- Gece hedefi olarak seçildiğinde erişilebilir olmalıdır.
+- Önceki binalardan farklı iç düzenlere sahip olabilmelidir.
+
+BİNA İLERLEMESİ
+
+Binalar, tanımlanmış ilerleme sırasına göre tamamlanır.
+
+Her bina için en az şu bilgiler tutulmalıdır:
+- Benzersiz bina kimliği.
+- Harita üzerindeki konum.
+- Hedef olarak seçilebilirlik.
+- Kilit durumu.
+- Tamamlanma durumu.
+- Görev gereksinimleri.
+- Ödül veya ekonomik sonuç.
+- İlgili çevresel hikâye öğeleri.
+
+Bina ilerlemesi tek bir merkezi veri sistemi tarafından yönetilir.
+
+Bir bina tamamlandığında:
+- Tamamlanma durumu kaydedilir.
+- Önceki binanın yeniden hedef seçilmesi engellenir.
+- Sonraki uygun bina belirlenir.
+- Harita güncellenir.
+- İlgili ilerleme göstergeleri güncellenir.
+
+Geliştirme sırasında bütün şehri bir anda üretmek yerine
+önce küçük bir şehir dilimi ve tek hedef bina oluştur.
+
+Ancak prototip aşamasında kullanılan geçici alanlar, nihai
+görsel kalite gereksiniminin yerine geçmez.
+
+
+======================================================================
+BÖLÜM 5 — SIĞINAK VE KALICI DUVAR HARİTASI
+======================================================================
+
+Sığınak, bir binanın altında bulunan fiziksel bir yeraltı alanıdır.
+
+Sığınak, yalnızca menülerin gösterildiği boş bir oda değildir.
+Oyuncuların hazırlık yaptığı, ilerlemeyi değerlendirdiği,
+eşya düzenlediği ve takım arkadaşlarıyla etkileşime girdiği
+oynanabilir bir mekândır.
+
+SIĞINAKTA BULUNMASI GEREKEN TEMEL ÖĞELER
+
+- Kalıcı şehir haritası.
+- Oyuncunun eşyalarını düzenleyebileceği alan.
+- Hazırlık için yeterli hareket alanı.
+- Anlaşılır giriş ve çıkış.
+- Atmosferik aydınlatma.
+- Ortama uygun çevresel sesler.
+- İlerleme ve hazırlık aşamasını destekleyen görsel öğeler.
+
+Sığınağın yerleşimi oyuncunun işlevsel nesneleri rahatça
+bulabilmesini sağlamalıdır.
+
+KALICI DUVAR HARİTASI
+
+Şehir haritası sığınağın duvarında fiziksel olarak asılı kalır.
+
+Harita:
+- Oyun dünyasında gerçek bir 3B nesne olmalıdır.
+- Oyuncu tarafından yakından incelenebilmelidir.
+- Şehirdeki binalarla mekânsal olarak tutarlı olmalıdır.
+- Aktif hedef binayı açık biçimde gösterebilmelidir.
+- Oyuncunun ilerlemesine göre uygun işaretleri güncelleyebilmelidir.
+- Oyun boyunca duvardaki yerinden kaybolmamalıdır.
+
+Haritanın görsel tasarımı oyunun atmosferine uygun olmalıdır.
+Kullanılacak kâğıt, baskı, çizim, işaretler, yırtıklar ve yüzey
+detayları profesyonel çevre sanatına uygun hazırlanmalıdır.
+
+HARİTA KOPYASI
+
+Oyuncu isterse duvardaki haritanın taşınabilir kopyasını alabilir.
+
+Kurallar:
+- Duvardaki ana harita yerinde kalır.
+- Kopya, oyuncunun envanterinde taşınabilir bir eşya olur.
+- Harita kopyası dört envanter yuvasından birini işgal eder.
+- Harita kopyası taşınırken geriye üç normal eşya yuvası kalır.
+- Kopya almak ana haritayı yok etmez.
+- Kopyanın envanterdeki durumu oyun kurallarına uygun şekilde
+  saklanır ve geri yüklenir.
+
+Harita kopyası fiziksel olarak elde tutulabilen bir eşya olmalıdır.
+Oyuncu haritayı açtığında harita okunabilir biçimde görüntülenmelidir.
+
+Harita görüntüsünün oyuncunun görüşünü tamamen kapatıp
+oynanışı bozması engellenmelidir.
+
+Harita arayüzü ile duvardaki harita aynı temel şehir verisini
+kullanmalıdır. Aynı bilginin iki farklı yerde birbirinden
+bağımsız şekilde elle güncellenmesine izin verme.
+
+
+======================================================================
+BÖLÜM 6 — ENVANTER VE EŞYA SİSTEMİ
+======================================================================
+
+Temel oyuncu envanteri dört yuvalıdır.
+
+Envanter, oyunun karar mekaniklerinden biridir.
+Oyuncu bir eşyanın değerini, kullanım amacını ve taşıma maliyetini
+düşünerek seçim yapmalıdır.
+
+ENVANTER KURALLARI
+
+- Dört temel eşya yuvası bulunur.
+- Her eşyanın benzersiz tanımlayıcısı bulunur.
+- Eşyanın sınıfı ve davranışı tanımlanır.
+- Eşya alma işlemi doğrulanır.
+- Envanter doluyken eşya alma işlemi uygun şekilde reddedilir.
+- Envanter arayüzü gerçek envanter durumunu gösterir.
+- Envanterdeki eşyalar çok oyunculu oyunda tutarlı olmalıdır.
+- Aynı eşya yanlışlıkla iki defa çoğaltılmamalıdır.
+- Geçersiz eşya referansları güvenli biçimde ele alınmalıdır.
+
+Harita kopyası bir envanter yuvası kullanır.
+Bu nedenle harita kopyası taşıyan oyuncunun üç boş eşya yuvası kalır.
+
+EŞYA MİMARİSİ
+
+Eşya tanımları ile eşya örneklerini birbirinden ayır.
+
+Eşya tanımı şu bilgileri içerebilir:
+- Eşya kimliği.
+- Görünen ad.
+- Açıklama.
+- Simge.
+- 3B model referansı.
+- Eşya türü.
+- Kullanılabilirlik.
+- Teslim edilebilirlik.
+- Ekonomik değer gerekiyorsa değeri.
+- İlgili etkileşim türü.
+
+Eşya örneği, dünyadaki belirli bir eşyanın gerçek durumunu temsil eder.
+
+Bir eşya alındığında:
+- Dünya nesnesinin sahipliği doğrulanır.
+- Envanter kapasitesi kontrol edilir.
+- İşlem yetkili oyun tarafında onaylanır.
+- Envanter güncellenir.
+- Dünya nesnesinin durumu güncellenir.
+- Değişiklik diğer oyunculara iletilir.
+
+İşlem başarısız olduğunda dünya nesnesi kaybolmamalıdır.
+
+Eşya bırakma, teslim etme ve envanterden çıkarma işlemleri
+ayrı ve açık kurallarla uygulanmalıdır.
+
+Bir eşyanın alınması ile görevin tamamlanması aynı olay değildir.
+Görev nesneleri yalnızca geçerli teslim veya tamamlanma kuralları
+karşılandığında ilgili ilerlemeyi değiştirmelidir.
+
+
+======================================================================
+BÖLÜM 7 — ETKİLEŞİM SİSTEMİ
+======================================================================
+
+Etkileşim sistemi bütün kullanılabilir nesneler için tutarlı
+bir temel sağlamalıdır.
+
+Oyuncu:
+- Nesneye yaklaşabilmelidir.
+- Nesnenin etkileşime uygun olduğunu anlayabilmelidir.
+- Gerekli etkileşim girdisini kullanabilmelidir.
+- Etkileşim sonucunu görsel veya işitsel olarak algılayabilmelidir.
+
+Etkileşim mesafesi ve etkileşim koşulları nesne türüne göre
+tanımlanabilir olmalıdır.
+
+Etkileşim mimarisi gereksiz yere her nesne için yeniden yazılmamalıdır.
+
+Temel etkileşim türleri:
+- Eşya alma.
+- Eşya bırakma.
+- Nesne inceleme.
+- Harita kopyasını alma.
+- Kullanılabilir çevresel nesnelerle etkileşim.
+- Gerekli görev nesneleriyle etkileşim.
+- Kapı veya geçit kullanımı.
+- Sığınağın işlevsel öğelerini kullanma.
+
+Her nesne bütün etkileşim türlerini desteklemek zorunda değildir.
+
+Etkileşim sistemi:
+- Yetkisiz istemcinin oyun durumunu doğrudan değiştirmesini
+  engellemelidir.
+- Nesnenin hâlâ kullanılabilir olduğunu doğrulamalıdır.
+- Tek bir etkileşimin birden fazla defa işlenmesini önlemelidir.
+- Geçersiz mesafe ve geçersiz durumları reddetmelidir.
+- Başarısız etkileşimleri anlaşılır biçimde raporlamalıdır.
+
+Görsel geri bildirim, ekranın büyük bir kısmını kaplayan
+gereksiz bildirimlerden oluşmamalıdır.
+
+
+======================================================================
+BÖLÜM 8 — OYUNCU HAREKETİ VE BİRİNCİ ŞAHIS DENEYİMİ
+======================================================================
+
+Birinci şahıs karakter kontrolü akıcı, tutarlı ve güvenilir olmalıdır.
+
+Gerekli temel davranışlar:
+- Yürüme.
+- Kamera kontrolü.
+- Çarpışma.
+- Merdiven veya basamaklarla uyumlu hareket.
+- Kapılardan ve dar geçitlerden geçme.
+- Çevresel nesnelerle doğru çarpışma.
+- Gerektiğinde çömelme veya saklanma.
+- Yüzeylere uygun ayak sesi üretimi.
+
+Koşma veya dayanıklılık mekaniği uygulanacaksa önce proje
+şartnamesindeki özgün kurallar doğrulanmalıdır. Yeni bir mekanik
+sırf alışılmış olduğu için eklenmemelidir.
+
+Hareket değerleri merkezi olarak ayarlanabilir olmalıdır.
+
+Kamera:
+- Oyuncunun hareketini anlaşılır biçimde takip etmelidir.
+- Gereksiz sarsıntı üretmemelidir.
+- Görüşü engelleyen çevresel nesnelerle uyumlu olmalıdır.
+- Korku atmosferini desteklemeli, kontrol hassasiyetini bozmamalıdır.
+
+Oyuncu duvarların içinden geçememeli, hareket sırasında
+zemine gömülmemeli veya nesnelerin üzerine rastgele fırlamamalıdır.
+
+Hareket sistemi ağ gecikmesi altında da kabul edilebilir
+bir deneyim sağlamalıdır.
+
+
+======================================================================
+BÖLÜM 9 — YARATIK TASARIMI VE DAVRANIŞ MİMARİSİ
+======================================================================
+
+Yaratıklar, korku deneyiminin merkezinde yer alır.
+
+Her yaratık yalnızca oyuncuya doğru koşan bir model olmamalıdır.
+Davranışları oyuncunun öğrenebileceği, gözlemleyebileceği ve
+karşı strateji geliştirebileceği kurallara sahip olmalıdır.
+
+YARATIK DAVRANIŞLARI
+
+Uygun yaratıklar aşağıdaki davranış durumlarını kullanabilir:
+- Bekleme.
+- Devriye.
+- Ses veya çevresel ipucu araştırma.
+- Şüphelenme.
+- Oyuncuyu tespit etme.
+- Takip.
+- Saldırı veya yakalama.
+- Hedefi kaybetme.
+- Son bilinen konumu araştırma.
+- Tehdidin sona ermesi.
+- Başlangıç durumuna dönme.
+
+Bu durumların tamamı her yaratıkta bulunmak zorunda değildir.
+Her yaratık kendi tasarımına uygun bir durum makinesine sahip olmalıdır.
+
+ALGILAMA
+
+Yaratıkların algılama sistemi:
+- Görüş.
+- Ses.
+- Mesafe.
+- Çevresel engeller.
+- İlgili yaratığa özgü algılama kuralları.
+
+gibi faktörleri destekleyebilir.
+
+Oyuncu duvarın arkasındayken, görüş hattı engelliyken veya
+yaratığın algılayamayacağı bir konumdayken haksız tespit
+oluşması engellenmelidir.
+
+Algılama davranışı deterministik ve test edilebilir kurallara
+dayanmalıdır.
+
+TAKİP
+
+Takip sırasında:
+- Yaratık hedef konumunu günceller.
+- Navigasyon geçerliliğini kontrol eder.
+- Erişilemeyen hedeflere sonsuza kadar takılmaz.
+- Geçiş noktalarında sıkışma durumunu ele alır.
+- Hedefi kaybettiğinde uygun arama davranışına geçer.
+- Tehdit sona erdiğinde doğru davranış durumuna geçer.
+
+Yaratıkların duvarlardan geçmesi, zeminin altına düşmesi veya
+oyuncunun arkasında açıklamasız şekilde ortaya çıkması normal
+davranış olarak kabul edilmez.
+
+SAKLAnMA VE TEHDİKTEN KURTULMA
+
+Oyuncunun saklanması ancak oyun dünyasındaki kurallara göre
+gerçekleşmelidir.
+
+Saklanma:
+- Geçerli bir konum veya etkileşim gerektirir.
+- İlgili yaratığın algılama kurallarına bağlıdır.
+- Oyuncuyu her durumda otomatik olarak görünmez yapmaz.
+- Gerekiyorsa ses veya hareket gibi riskleri korur.
+
+Oyuncu gerçekten tehditten kurtulduğunda yaratığın takip
+durumu doğru biçimde güncellenmelidir.
+
+Korku yaratmak amacıyla hileli ve açıklamasız algılama
+davranışları üretme.
+
+
+======================================================================
+BÖLÜM 10 — GECE, ZAMAN VE OYUN DURUMLARI
+======================================================================
+
+Gündüz ve gece birbirinden ayrılmış oyun durumlarıdır.
+
+Önerilen merkezi durumlar:
+- Başlangıç.
+- Ana menü.
+- Oturum hazırlığı.
+- Sığınakta hazırlık.
+- Geceye geçiş.
+- Gece keşfi.
+- Hedef tamamlama.
+- Geri dönüş.
+- Gün sonu değerlendirmesi.
+- Başarısızlık.
+- Oturum sonu.
+
+Kesin süreler, oyun dengesi ve özgün tasarım şartnamesiyle
+belirlenir. Doğrulanmamış süreleri sabit oyun kuralı olarak
+uydurma.
+
+ZAMAN YÖNETİMİ
+
+- Ortak oyun zamanı tek bir yetkili sistem tarafından yönetilir.
+- İstemciler ortak zamanın görsel gösterimini yapar.
+- Aynı zamanlayıcının birden fazla defa başlatılması engellenir.
+- Duraklatma ve oturum devamı davranışları tanımlanır.
+- Gece sona erdiğinde ilgili oyun durumu güvenli biçimde değişir.
+- Oyuncu geçiş sırasında aynı ödülü tekrar alamaz.
+- Oturum yüklenirken zamanlayıcı yanlışlıkla birden fazla kez
+  çalıştırılmaz.
+
+Gün değişimi:
+- Önceki günün sonuçlarını kesinleştirir.
+- Geçerli ilerlemeyi korur.
+- Sonraki hedefi belirler.
+- İlgili çevresel ve oyun durumu değişikliklerini uygular.
+- Yeni hazırlık aşamasını başlatır.
+
+Bütün sistemler hangi oyun durumlarında çalışabileceklerini
+açıkça tanımlamalıdır.
+
+Örneğin hedef bina seçimi hazırlık aşamasında yapılmalı;
+gece devam ederken rastgele başka bir binaya geçilmemelidir.
+
+
+======================================================================
+BÖLÜM 11 — EKONOMİ, TESLİMAT VE İLERLEME
+======================================================================
+
+Ekonomik sistem, keşif ve risk alma kararlarını desteklemelidir.
+
+Oyuncuların topladıkları her eşya otomatik olarak para üretmemelidir.
+Önce eşyanın teslim edilebilirliği ve ilgili görev koşulları
+kontrol edilmelidir.
+
+EKONOMİ KURALLARI
+
+- Ekonomik değerler merkezi verilerde tutulur.
+- Hesaplama yalnızca yetkili oyun tarafında yapılır.
+- Geçersiz veya negatif değerler uygun şekilde ele alınır.
+- Aynı teslimat birden fazla defa ödüllendirilmez.
+- Gün sonu hesaplaması yeniden çalıştırıldığında aynı sonuç
+  ikinci defa uygulanmaz.
+- Oyuncuya gösterilen sonuç gerçek oyun durumuyla eşleşir.
+- Kaydetme ve yükleme ekonomik tutarlılığı bozmaz.
+
+TESLİMAT
+
+Teslimat işlemi:
+1. Teslim edilen nesneyi doğrular.
+2. Nesnenin teslim edilebilir olduğunu kontrol eder.
+3. Nesnenin geçerli sahibini veya envanter durumunu doğrular.
+4. Görev koşullarını değerlendirir.
+5. Teslimatı benzersiz biçimde kaydeder.
+6. Ekonomik sonucu uygular.
+7. İlgili arayüzleri günceller.
+
+İşlem yarıda başarısız olursa nesnenin kaybolup ödülün
+verilmediği veya ödülün verilip nesnenin hâlâ taşındığı
+tutarsız durumlar oluşmamalıdır.
+
+Ekonomik denge:
+- Oyuncuyu gereksiz eşya toplamaya zorlamamalıdır.
+- Dört yuvalı envanteri anlamlı hâle getirmelidir.
+- Risk ve ödül arasında kararlar üretmelidir.
+- İlerlemeyi imkânsız kılacak biçimde rastgeleleşmemelidir.
+
+
+======================================================================
+BÖLÜM 12 — GÖREV TASARIMI VE ÇEVRESEL HİKÂYE ANLATIMI
+======================================================================
+
+Her hedef binanın kendi mekânsal ve anlatısal kimliği olmalıdır.
+
+Binalar yalnızca farklı kaplama uygulanmış aynı iç mekânın
+kopyaları olmamalıdır.
+
+Çevresel hikâye anlatımı şu araçları kullanabilir:
+- Terk edilmiş eşyalar.
+- Yıpranmış mobilyalar.
+- Kırık veya devrilmiş nesneler.
+- Notlar ve belgeler.
+- Eski işaretler.
+- Işık ve gölge düzeni.
+- Ses kaynakları.
+- Mekânsal düzen ve izler.
+
+Bu öğeler oyuncuya hikâyeyi doğrudan anlatmak yerine
+çevreyi inceleyerek anlam çıkarma fırsatı vermelidir.
+
+Ancak görev için zorunlu bilgi, tamamen belirsiz ve
+bulunması imkânsız bir noktaya gizlenmemelidir.
+
+HER BİNA İÇİN TASARIM KONTROLÜ
+
+- Binanın görsel kimliği nedir?
+- Oyuncu neden buraya gelmektedir?
+- Ana hedef nerede bulunur?
+- Oyuncu hangi risklerle karşılaşabilir?
+- Hangi çevresel ipuçları oyuncuya yardımcı olur?
+- Hangi alanlar isteğe bağlıdır?
+- Geri dönüş yolu anlaşılır mıdır?
+- Binanın diğerlerinden farkı nedir?
+- Görev tamamlanması nasıl doğrulanır?
+
+Bu sorulara yanıt vermeyen odalar ve nesneler gereksiz yere
+üretilmemelidir.
+
+
+======================================================================
+BÖLÜM 13 — ÇOK OYUNCULU MİMARİ VE AĞ OTORİTESİ
+======================================================================
+
+Çok oyunculu destek sonradan eklenen bir görsel özellik değildir.
+Oyun mimarisi ilk aşamadan itibaren bunu hesaba katmalıdır.
+
+Önce kullanılabilir bağlantı altyapısını ve Unreal Engine
+projesinin mevcut ağ yapılandırmasını doğrula.
+
+Ağ bağlantısı için kullanılacak sistem, mevcut proje ve
+platform hedefleriyle uyumlu olmalıdır. Desteklenmeyen bir
+servisin hazır olduğu varsayılmamalıdır.
+
+SUNUCU OTORİTESİ
+
+Aşağıdaki kritik işlemler yetkili oyun tarafında doğrulanır:
+- Eşya alma.
+- Envanter değişikliği.
+- Eşya bırakma.
+- Teslimat.
+- Ekonomik ödüller.
+- Hedef bina ilerlemesi.
+- Gece ve gündüz geçişleri.
+- Yaratıkların önemli davranış durumları.
+- Oyuncunun ölüm veya yakalanma durumu.
+- Ortak oyun zamanlayıcısı.
+- Ortak görev tamamlanması.
+
+İstemci, kendi ekranındaki bir değeri değiştirerek ortak
+oyun sonucunu doğrudan belirleyememelidir.
+
+AĞ MİMARİSİ
+
+Uygun yerlerde:
+- Replicated değişkenler.
+- RPC çağrıları.
+- Yetki kontrolleri.
+- Benzersiz işlem kimlikleri.
+- Oyun durumu yönetimi.
+- Yeniden bağlanma ve oturum devamı kuralları.
+
+kullanılmalıdır.
+
+Her değişkeni gereksiz yere ağ üzerinden göndermeyin.
+Yalnızca gerekli ortak durumlar çoğaltılmalıdır.
+
+Oyuncunun kişisel arayüz ayarları ortak oyun durumuna
+bağlanmamalıdır.
+
+ÇOK OYUNCULU TESTLER
+
+En az iki ayrı oyun istemcisiyle şu senaryolar test edilir:
+- Aynı oturuma bağlanma.
+- Oyuncuların birbirini görmesi.
+- Hareket ve konum güncellemeleri.
+- Aynı eşyayı eş zamanlı almaya çalışma.
+- Envanter kapasitesinin korunması.
+- Harita kopyası alma.
+- Hedef binanın ortak gösterimi.
+- Gece geçişinin bütün istemcilerde tutarlı olması.
+- Teslimatın yalnızca bir kez işlenmesi.
+- Oyuncu bağlantısının kesilmesi.
+- Host bağlantısının kesilmesi.
+- Oturumdan çıkma ve yeniden katılma davranışı.
+
+Yerel iki istemcinin aynı bilgisayarda çalışması, internet
+üzerinden bağlantının doğrulandığı anlamına gelmez.
+
+Çevrim içi erişim ve dış ağ bağlantısı ayrıca test edilmelidir.
+
+Host tabanlı mimarinin sınırlamaları tasarım ve test belgelerinde
+açıkça belirtilmelidir.
+
+
+======================================================================
+BÖLÜM 14 — OYUNCU DURUMU, ÖLÜM VE OTURUM DEVAMI
+======================================================================
+
+Oyuncunun yaşam durumu merkezi ve tutarlı bir yapıda tutulmalıdır.
+
+İlgili durumlar:
+- Aktif.
+- Yaralanmışsa ilgili yaralanma durumu.
+- Yakalanmış veya ölmüşse ilgili durum.
+- İzleyici.
+- Oturumdan ayrılmış.
+
+Yalnızca tasarımda gerçekten bulunan durumları uygula.
+Özgün tasarımda olmayan sağlık, zırh veya benzeri sistemleri
+varsayılan olarak ekleme.
+
+ÖLÜM SONRASI
+
+Ölen oyuncunun:
+- Görüntüleme davranışı.
+- Oturumda kalıp kalamayacağı.
+- Takım arkadaşlarını izleme davranışı.
+- Eşyalarının durumu.
+- Sonraki güne dönüp dönemeyeceği.
+
+açık kurallara bağlanmalıdır.
+
+Ölüm sonrası davranış, mevcut oyunun ilerleme kurallarıyla
+çelişmemelidir.
+
+Kalıcı ölüm uygulanacaksa bunun oyun tasarımında açıkça
+tanımlanması gerekir. Aksi belirtilmedikçe geçici bir ölüm
+mekaniği kendiliğinden kalıcı ölüme dönüştürülmemelidir.
+
+Oyuncu bağlantısı kesildiğinde oyuncu verisinin ve sahip olduğu
+eşyaların nasıl ele alınacağı belirlenmelidir.
+
+Host ayrıldığında oturumun devam edip etmeyeceği, kapanıp
+kapanmayacağı veya yeniden kurulup kurulamayacağı mimarinin
+gerçek olanaklarına göre tanımlanmalıdır.
+
+Çalışmayan bir yeniden bağlanma sistemini varmış gibi gösterme.
+
+
+======================================================================
+BÖLÜM 15 — KAYIT VE YÜKLEME SİSTEMİ
+======================================================================
+
+Kayıt sistemi, oyun ilerlemesini güvenilir biçimde korumalıdır.
+
+Kaydedilebilecek veriler:
+- Gün numarası.
+- Bina ilerlemesi.
+- Tamamlanmış görevler.
+- Ekonomik durum.
+- İlgili oyuncu durumları.
+- Kalıcı dünya durumu.
+- Gerekli envanter bilgileri.
+- Oyun sürümü ve kayıt biçimi sürümü.
+
+Kişisel grafik, ses ve kontrol ayarları ortak kampanya
+verilerinden ayrı tutulmalıdır.
+
+KAYIT KURALLARI
+
+- Kayıt verisi sürüm bilgisi içermelidir.
+- Geçersiz kayıt verisi kontrol edilmelidir.
+- Yükleme sırasında bulunmayan nesneler güvenli şekilde ele alınmalıdır.
+- Kayıt dosyasının eksik veya bozuk olması oyun çökmesine
+  yol açmamalıdır.
+- Mümkünse yazma işlemi geçici bir dosya üzerinden güvenli
+  biçimde tamamlanmalıdır.
+- Yarım kalan kayıt işlemleri tespit edilmelidir.
+- Gün sonu ödülleri tekrar yüklemede çoğaltılmamalıdır.
+- Aynı ilerleme durumu iki kez uygulanmamalıdır.
+- Eski kayıt sürümleri desteklenmiyorsa kullanıcıya anlaşılır
+  bir hata gösterilmelidir.
+
+KAYIT KATEGORİLERİ
+
+1. Kampanya verileri.
+2. Oturum verileri.
+3. Kişisel kullanıcı ayarları.
+
+Bu kategorileri tek bir sınırsız ve kontrolsüz veri nesnesinde
+birleştirme.
+
+Kayıt sistemi için gerekli veri yapıları merkezi olmalıdır.
+
+Host bilgisayarında tutulan kayıt dosyasının, gerçek bir
+uzak sunucuda saklanan verilerle aynı güvenlik ve erişilebilirlik
+garantilerine sahip olmadığı kabul edilmelidir.
+
+Kayıt işlemi başarılı değilse başarı mesajı gösterilmemelidir.
+
+
+======================================================================
+BÖLÜM 16 — GÖRSEL KALİTE VE SANAT YÖNETİMİ
+======================================================================
+
+GRAVE SHIFT profesyonel bir görsel kimliğe sahip olmalıdır.
+
+Hedeflenen görsel yaklaşım:
+- Gerçekçi malzeme kullanımı.
+- Karanlık ve kontrollü aydınlatma.
+- İnandırıcı mekânsal düzen.
+- Ayrıntılı çevre modelleri.
+- Tutarlı renk paleti.
+- Yıpranmış ve kullanılmış yüzeyler.
+- Gerilim oluşturan görüş mesafeleri.
+- Kontrollü sis ve atmosfer efektleri.
+- Çevresel hikâye anlatımını destekleyen görsel kompozisyon.
+
+Görsel kaliteyi yalnızca yüksek çözünürlüklü dokularla
+ölçme. Geometri, siluet, malzeme, ışık, ölçek, kompozisyon
+ve animasyon birlikte değerlendirilmelidir.
+
+VARLIK ÜRETİMİ
+
+Oyun dünyasında görünen önemli nesneler için uygun 3B modeller
+ve materyaller oluştur.
+
+Örnekler:
+- Kapılar.
+- Tahta bariyerler.
+- Mobilyalar.
+- Duvarlar ve zeminler.
+- Sığınak ekipmanları.
+- Harita.
+- Taşınabilir eşyalar.
+- Yaratıklar.
+- Çevresel dekorlar.
+- Görev nesneleri.
+- Işık kaynakları.
+- Kullanılabilir makineler ve cihazlar.
+
+Küp, küre veya basit geometrik şekiller yalnızca geçici
+bloklama ve erken teknik prototipleme için kullanılabilir.
+
+Bu geçici şekilleri nihai sanat üretimi olarak sunma.
+
+Görünen bir nesne için hazır bir modelin bulunmadığı durumlarda:
+- Projenin mevcut varlıklarını incele.
+- Kullanılabilir üretim araçlarını doğrula.
+- Uygun 3B model üretimini gerçekleştir.
+- Modeli doğru ölçekte ve malzemeyle oyuna entegre et.
+- Çarpışma ve performansını test et.
+
+Gereksiz sayıda birbirinin aynısı varlık üretme.
+Tekrar kullanılan varlıklar için uygun varyasyonlar oluştur.
+
+KALİTE KONTROLÜ
+
+Her önemli varlık:
+- Doğru ölçekte olmalı.
+- Sahneye doğru yerleştirilmelidir.
+- Uygun materyallere sahip olmalıdır.
+- Gerektiğinde doğru çarpışma geometrisi içermelidir.
+- Uygun ışık altında değerlendirilmelidir.
+- Kameradan görüldüğünde bozuk geometri veya materyal
+  hatası göstermemelidir.
+
+Varlıkların oyunda gerçekten göründüğünü doğrula.
+Yalnızca içerik tarayıcısında bulunmaları yeterli değildir.
+
+
+======================================================================
+BÖLÜM 17 — ÇEVRE SANATI VE SEVİYE TASARIMI
+======================================================================
+
+Şehir, sığınak ve binalar aynı sanat yönetimi altında olmalıdır.
+
+Şehirde:
+- Farklı yüzey türleri.
+- Yıpranmış yapı malzemeleri.
+- Çevresel hasarlar.
+- Terk edilmiş nesneler.
+- Karanlık geçitler.
+- Görüşü sınırlayan alanlar.
+- İşlevsel yön bulma ipuçları.
+
+kullanılabilir.
+
+Her çevresel nesne gelişigüzel yerleştirilmemelidir.
+
+Nesne yerleşimi:
+- Oyuncunun hareketini.
+- Görüş hattını.
+- Yaratık navigasyonunu.
+- Ses yayılımını.
+- Etkileşim alanlarını.
+- Performansı.
+
+etkilemektedir.
+
+Çarpışma geometrileri görsel modellerle tutarlı olmalıdır.
+Oyuncu görünmez duvarlara takılmamalı, zeminin içine düşmemeli
+ve dekoratif nesnelerin içinden geçmemelidir.
+
+SEVİYE TASARIMI
+
+Önce bir hedef binayı baştan sona oynanabilir hâle getir.
+
+Bu bina:
+- Şehirden erişilebilir olmalıdır.
+- Okunabilir bir girişe sahip olmalıdır.
+- İşlevsel iç mekânlar içermelidir.
+- Ana hedefe ulaşılabilir bir rota sağlamalıdır.
+- Tehdit davranışları için uygun alanlar içermelidir.
+- Geri dönüşü mümkün kılmalıdır.
+- Görsel ve işitsel açıdan tamamlanmış olmalıdır.
+
+İlk binanın kalitesi doğrulanmadan bütün şehri ayrıntılı
+olarak üretmeye başlama.
+
+Bununla birlikte ilk binada kullanılan geçici sanat öğelerini
+nihai teslimat olarak kabul etme.
+
+
+======================================================================
+BÖLÜM 18 — KARAKTER MODELLERİ VE ANİMASYON
+======================================================================
+
+Oyuncu ve yaratık modelleri oyunun genel görsel kalitesiyle
+uyumlu olmalıdır.
+
+Oyuncu karakterinde:
+- Birinci şahıs kamera için uygun kurulum.
+- Doğru çarpışma.
+- Hareketle uyumlu animasyonlar.
+- Uygun el ve eşya pozisyonları.
+- Etkileşim sırasında doğru hareket.
+- Gereksiz kamera veya iskelet titremesinin önlenmesi.
+
+gereklidir.
+
+Yaratıklarda:
+- Karakterin boyutuna uygun animasyonlar.
+- Hareket ve yön değişimiyle uyumlu animasyon geçişleri.
+- Algılama ve takip durumlarını yansıtan davranışlar.
+- Yakalama veya saldırı varsa buna uygun animasyonlar.
+- Uygun ses ve animasyon senkronizasyonu.
+
+sağlanmalıdır.
+
+Animasyonlar yalnızca görsel olarak oynatılmamalıdır.
+İlgili oyun durumlarıyla uyumlu çalışmalıdır.
+
+Bir yaratık saldırı animasyonu oynatırken oyuncu gerçekte
+çok uzaktaysa haksız yakalama gerçekleşmemelidir.
+
+Görsel animasyon ile oyun mantığının farklı zamanlarda
+çalışmasından kaynaklanan hatalar test edilmelidir.
+
+
+======================================================================
+BÖLÜM 19 — IŞIKLANDIRMA VE ATMOSFER
+======================================================================
+
+Işıklandırma, oyuncunun çevreyi algılama biçimini doğrudan
+etkileyen temel oynanış sistemlerinden biridir.
+
+Hedeflenen atmosfer:
+- Karanlık ama tamamen okunamaz olmayan çevre.
+- Kontrollü ışık kaynakları.
+- Uygun gölge kullanımı.
+- Mekânlara özgü ışık renkleri.
+- Görüş mesafesini destekleyen atmosfer.
+- Gerilim oluşturan ışık kontrastları.
+- Sığınağın dış dünyadan farklı bir his vermesi.
+
+Her sahneyi tamamen karanlık yaparak korku üretmeye çalışma.
+
+Oyuncunun:
+- Yürüyebileceği zemini.
+- Önemli geçişleri.
+- Etkileşimli nesneleri.
+- Tehlikeli bölgelerin bazı ipuçlarını.
+
+uygun koşullarda algılayabilmesi gerekir.
+
+Sis ve post-process efektleri ölçülü kullanılmalıdır.
+Aşırı efektler performansı ve görsel okunabilirliği bozmamalıdır.
+
+Işıklandırma, hedef donanımda performans testine tabi tutulmalıdır.
+
+
+======================================================================
+BÖLÜM 20 — SES TASARIMI VE MÜZİK
+======================================================================
+
+Ses tasarımı, GRAVE SHIFT'in korku atmosferinin temel
+bileşenlerinden biridir.
+
+Sesler yalnızca arka plan süsü değildir. Oyuncu bazı
+tehlikeleri ses üzerinden değerlendirebilmelidir.
+
+SES KATEGORİLERİ
+
+- Ana menü müziği.
+- Ortam sesleri.
+- Sığınak sesleri.
+- Şehir ambiyansı.
+- Ayak sesleri.
+- Kapı ve etkileşim sesleri.
+- Eşya alma ve bırakma sesleri.
+- Yaratık sesleri.
+- Yaratık hareket sesleri.
+- Tehdit algılama sesleri.
+- Kovalamaca müziği.
+- Tehlike sona erdiğinde kullanılan ses geçişleri.
+- Gün sonu ve ilerleme geri bildirimleri.
+
+SES KALİTESİ
+
+Sesler:
+- İlgili nesne veya karakterle eşleşmelidir.
+- Uygun ses seviyesinde çalmalıdır.
+- Gereksiz yere üst üste birikmemelidir.
+- Mesafe ve konumla uyumlu olmalıdır.
+- Diğer önemli sesleri tamamen bastırmamalıdır.
+- Ses ayarlarına uymalıdır.
+
+KOVALAMACA MÜZİĞİ
+
+Kovalamaca müziği, tehdit durumuyla ilişkili olmalıdır.
+
+Müzik:
+- Tehdit başladığında uygun bir geçişle devreye girmelidir.
+- Tehdit devam ederken gerilimi desteklemelidir.
+- Oyuncu tehditten gerçekten kurtulduğunda kademeli biçimde
+  azalmalı veya uygun ambiyansa geçmelidir.
+- Oyuncu geçerli saklanma kurallarıyla tehdidi atlattığında
+  müzik uygun biçimde azaltılmalıdır.
+- Tehdit tekrar başladığında müzik yeniden geçiş yapabilmelidir.
+
+Kovalamaca müziğini yalnızca oyuncu bir yaratığa yakın olduğu
+için sürekli çalma.
+
+Müzik durumu, gerçek tehdit durumu ve oyuncunun algılanan
+tehlikesiyle tutarlı olmalıdır.
+
+Ses geçişlerinde ani ses kesilmeleri ve kontrolsüz ses
+patlamaları önlenmelidir.
+
+Aynı kovalamaca müziğinin her karede tekrar başlatılması
+veya birden fazla ses örneğinin üst üste binmesi engellenmelidir.
+
+YARATIK SESLERİ
+
+Yaratıkların sesleri davranış durumlarıyla uyumlu olmalıdır.
+
+Örneğin:
+- Bekleme sırasında uygun ortam sesi.
+- Hareket sırasında hareket sesi.
+- Araştırma sırasında uygun ses davranışı.
+- Takip sırasında tehdit hissini artıran sesler.
+- Tehdit sona erdiğinde uygun uzaklaşma veya sessizlik.
+
+Sesler yaratığın gerçek konumu ve davranışıyla tutarlı olmalıdır.
+
+MENÜ MÜZİĞİ
+
+Ana menü için oyunun atmosferini yansıtan ayrı bir müzik
+veya uygun özgün ses tasarımı hazırlanmalıdır.
+
+Ana menüden oyuna geçiş sırasında seslerin doğru biçimde
+başlatılması ve durdurulması sağlanmalıdır.
+
+Ses sistemi:
+- Ana ses seviyesi.
+- Müzik seviyesi.
+- Efekt seviyesi.
+
+gibi ayarları desteklemelidir.
+
+Eksik ses dosyalarını sessizce yok saymak yerine geliştirme
+günlüğünde raporla.
+
+
+======================================================================
+BÖLÜM 21 — KULLANICI ARAYÜZÜ TASARIMI
+======================================================================
+
+Arayüz, oyunun atmosferini destekleyen profesyonel bir tasarıma
+sahip olmalıdır.
+
+Arayüzün görünümü:
+- Tutarlı tipografi.
+- Tutarlı renk paleti.
+- Okunabilir metinler.
+- Dengeli boşluk kullanımı.
+- Anlaşılır simgeler.
+- Tutarlı kenarlık ve panel biçimleri.
+- Doğru hizalama.
+- Kontrollü animasyonlar.
+
+üzerine kurulmalıdır.
+
+Varsayılan ve birbirinden bağımsız görünümlere sahip paneller
+bir araya getirilerek nihai arayüz oluşturulmuş gibi davranma.
+
+Arayüzün her ekranı aynı tasarım sistemini kullanmalıdır.
+
+GEREKLİ ARAYÜZLER
+
+- Ana menü.
+- Oturum oluşturma veya katılma ekranı.
+- Hazırlık ekranı.
+- Envanter.
+- Taşınabilir harita görüntüsü.
+- Etkileşim geri bildirimi.
+- Oyun içi gerekli durum göstergeleri.
+- Gün sonu sonuç ekranı.
+- Ayarlar.
+- Duraklatma menüsü.
+- Bağlantı ve hata bildirimleri.
+
+Yalnızca gerekli bilgi oyuncuya gösterilmelidir.
+
+Korku atmosferini bozacak aşırı büyük, parlak ve sürekli
+ekranda duran göstergelerden kaçın.
+
+Arayüz, fare ve klavye kullanımıyla test edilmelidir.
+
+Menüler arasında gezinirken oyun durumunun yanlışlıkla
+değişmesi veya birden fazla ekranın üst üste açılması
+engellenmelidir.
+
+
+======================================================================
+BÖLÜM 22 — ANA MENÜ VE OYUNA GİRİŞ
+======================================================================
+
+Ana menü, oyunun görsel kimliğini ilk kez gösteren profesyonel
+bir giriş deneyimi sunmalıdır.
+
+Ana menüde:
+- GRAVE SHIFT logosu veya başlık tasarımı.
+- Oyunun atmosferine uygun arka plan.
+- Uygun menü müziği.
+- Başlatma veya oturum seçenekleri.
+- Ayarlar.
+- Çıkış.
+- Gerekiyorsa sürüm bilgisi.
+
+bulunmalıdır.
+
+Arka plan, mümkünse oyunun gerçek dünyasından oluşturulmuş
+özenli bir sahne veya uygun bir sinematik sunum olmalıdır.
+
+Ana menü, basit bir boş arka plan ve standart butonlar
+olarak bırakılmamalıdır.
+
+MENÜ DAVRANIŞI
+
+- Menü açıldığında doğru giriş durumu etkinleşmelidir.
+- Oyun içi karakter kontrolü menüde etkin olmamalıdır.
+- Menüden oyuna geçiş doğru oyun durumunu başlatmalıdır.
+- Tek oyunculu ve çok oyunculu seçenekler gerçek işlevlerine
+  sahip olmalıdır.
+- Henüz uygulanmamış bir seçenek çalışıyormuş gibi gösterilmemelidir.
+- Bağlantı hataları anlaşılır biçimde gösterilmelidir.
+- Çıkış işlemi güvenli biçimde gerçekleştirilmelidir.
+
+Menü arka planı ve butonları farklı ekran çözünürlüklerinde
+doğru görünmelidir.
+
+
+======================================================================
+BÖLÜM 23 — YARATIK KORKUSU, GERİLİM VE SESLİ GERİ BİLDİRİM
+======================================================================
+
+Korku tasarımı, oyuncunun bilgi eksikliği ile çevreyi
+anlamlandırma çabası arasındaki gerilimi kullanmalıdır.
+
+Temel araçlar:
+- Görüş alanı kısıtlaması.
+- Belirsiz ses kaynakları.
+- Uzakta görülen hareketler.
+- Çevresel değişiklikler.
+- Yaratığın algılama kuralları.
+- Güvenli ve güvensiz alanların farklı hissedilmesi.
+- Tehdit sona erdiğinde oluşan sessizlik.
+- Oyuncunun sınırlı kaynaklarla karar vermesi.
+
+Korku, sürekli ses patlaması veya rastgele ekran sarsıntısı
+kullanılarak oluşturulmamalıdır.
+
+Korku anları:
+- Oyun bağlamına uygun olmalıdır.
+- Oyuncunun dikkatini anlamsız yere dağıtmamalıdır.
+- Ses ve görsel efektlerle tutarlı olmalıdır.
+- Oynanış kontrolünü gereksiz yere ortadan kaldırmamalıdır.
+
+Bir korku olayı tetiklendiğinde aynı olayın yanlışlıkla
+birden fazla defa çalışması engellenmelidir.
+
+Korku tasarımının amacı oyuncuyu yalnızca şaşırtmak değil,
+çevreye dikkat etmeye ve kararlarının sonuçlarını düşünmeye
+teşvik etmektir.
+
+
+======================================================================
+BÖLÜM 24 — TEKNİK MİMARİ VE SINIF SORUMLULUKLARI
+======================================================================
+
+Teknik mimari modüler, anlaşılır ve genişletilebilir olmalıdır.
+
+Mevcut projeyi incelemeden yeni sınıflar oluşturma.
+Projede zaten var olan uygun sınıfları ve sistemleri kullan.
+
+Gerekli sorumluluklar mantıksal olarak ayrılmalıdır.
+
+Örnek mimari sorumluluklar:
+
+GAME MODE
+- Yetkili oyun kuralları.
+- Oyun aşamalarının geçişleri.
+- Görev tamamlanması.
+- Gün sonu değerlendirmesi.
+
+GAME STATE
+- Ortak oyun durumu.
+- Aktif gün ve gece bilgisi.
+- Aktif hedef bina.
+- Diğer istemcilerin bilmesi gereken ortak durumlar.
+
+GAME INSTANCE
+- Yerel oturum yaşam döngüsü.
+- Menü ve oturum geçişleri için gerekli kalıcı yerel bağlam.
+
+PLAYER CONTROLLER
+- Oyuncu girdileri.
+- Kamera ve kontrol davranışları.
+- Uygun etkileşim talepleri.
+
+PLAYER STATE
+- Oyuncuya ait ağ üzerinden paylaşılması gereken durumlar.
+- Oyuncu kimliği ve gerekli ortak bilgiler.
+
+CHARACTER
+- Hareket.
+- Çarpışma.
+- Animasyon.
+- Oyuncunun dünya içindeki davranışları.
+
+INVENTORY COMPONENT
+- Eşya yuvaları.
+- Eşya alma ve bırakma kuralları.
+- Envanter doğrulaması.
+
+INTERACTION COMPONENT
+- Etkileşim sorgusu.
+- Etkileşim mesafesi.
+- Etkileşim türü.
+- Geçerli etkileşim kontrolü.
+
+ITEM DATA
+- Eşya tanımları.
+- Görsel referanslar.
+- Eşya türleri.
+- Gereken statik bilgiler.
+
+WORLD ITEM
+- Dünyadaki belirli eşyanın durumu.
+- Alınabilirlik.
+- Görsel temsil.
+- İlgili etkileşimler.
+
+ENEMY AI
+- Algılama.
+- Davranış durumları.
+- Navigasyon.
+- Hedef seçimi.
+- Tehdit durumu.
+
+AUDIO MANAGER
+- Ses geçişleri.
+- Müzik durumu.
+- Ses seviyeleri.
+- Tekrarlanan seslerin kontrolü.
+
+SAVE SYSTEM
+- Kayıt biçimi.
+- Veri doğrulama.
+- Güvenli kaydetme ve yükleme.
+
+UI LAYER
+- Verilerin görüntülenmesi.
+- Oyuncu girdilerinin alınması.
+- Oyun durumuyla uyumlu ekran geçişleri.
+
+Bu isimler zorunlu sınıf adları değildir.
+Önemli olan sorumlulukların tutarlı biçimde ayrılmasıdır.
+
+Her sistemi yalnızca bir kez oluştur.
+Aynı işlevi gerçekleştiren gereksiz paralel sistemler üretme.
+
+Bir sistemin hangi verinin sahibi olduğunu açıkça belirle.
+Aynı temel oyun durumunun farklı sınıflarda birbirinden
+bağımsız biçimde tutulmasına izin verme.
+
+
+======================================================================
+BÖLÜM 25 — VERİ YÖNETİMİ VE DURUM MAKİNELERİ
+======================================================================
+
+Oyun durumları açıkça tanımlanmalıdır.
+
+Bir sistemin durum değişimi:
+- Önceki durum.
+- Yeni durum.
+- Geçiş koşulu.
+- Geçişi gerçekleştirme yetkisi.
+- Yan etkiler.
+- Test edilebilir sonuç.
+
+bilgilerini içermelidir.
+
+Örneğin gece keşfinden gün sonuna geçildiğinde:
+- Geceye ait zamanlayıcı durmalıdır.
+- Görev sonucu değerlendirilmelidir.
+- Teslimatlar kesinleştirilmelidir.
+- Ekonomik hesaplama yalnızca bir defa yapılmalıdır.
+- Gerekli kayıt gerçekleştirilmelidir.
+- Sonraki hazırlık aşaması açılmalıdır.
+
+Durum geçişleri tekrar çağrıldığında aynı yan etkilerin
+birden fazla kez gerçekleşmesi engellenmelidir.
+
+GEÇERSİZ GEÇİŞLER
+
+Örnek:
+- Ana menüden doğrudan gün sonuna geçilemez.
+- Tamamlanmış bir bina normal ilerlemede yeniden aktif hedef olamaz.
+- Teslim edilmiş bir eşya tekrar teslim edilerek ödül üretemez.
+- Aynı gece başlangıcı birden fazla kez çalıştırılamaz.
+- Geçersiz oturum yüklemesi aktif oyunu bozmaz.
+
+Bu kontroller yalnızca arayüzde değil, yetkili oyun mantığında
+da uygulanmalıdır.
+
+
+======================================================================
+BÖLÜM 26 — PERFORMANS VE BELLEK YÖNETİMİ
+======================================================================
+
+Görsel kalite ile performans birlikte değerlendirilmelidir.
+
+Performans optimizasyonu için:
+- Uygun LOD kullanımı.
+- Görüş alanına göre çizim optimizasyonu.
+- Gereksiz tick işlemlerinin azaltılması.
+- Uygun çarpışma karmaşıklığı.
+- Materyal ve ışıklandırma maliyetinin kontrolü.
+- Gereksiz ses kaynaklarının durdurulması.
+- Uygun nesne yeniden kullanımı.
+- Uygun yükleme ve boşaltma stratejileri.
+
+uygulanmalıdır.
+
+Her Actor veya Component için sürekli Tick kullanma.
+Olay tabanlı çözüm yeterliyse olay tabanlı çözümü tercih et.
+
+Yalnızca ihtiyaç olduğunda hesaplama yap.
+
+Performans sorunları ölçülmeden rastgele optimizasyon yapma.
+
+Önce gerçek darboğazı belirle:
+- CPU.
+- GPU.
+- Bellek.
+- Ağ.
+- Fizik.
+- Yapay zekâ.
+- Ses.
+- Varlık yükleme.
+
+Bir optimizasyon görsel kaliteyi veya oyun doğruluğunu
+bozuyorsa etkisini ölç ve tasarım gereksinimleriyle karşılaştır.
+
+Hedef donanım bilgisi doğrulanmadan kesin FPS garantisi verme.
+
+
+======================================================================
+BÖLÜM 27 — DOSYA DÜZENİ VE KOD KALİTESİ
+======================================================================
+
+Projenin mevcut dosya düzenini incele ve onunla tutarlı çalış.
+
+Dosya adları, sınıf isimleri ve veri yapıları anlaşılır olmalıdır.
+
+Kod:
+- Gereksiz tekrar içermemelidir.
+- Sorumlulukları açık biçimde ayırmalıdır.
+- Geçersiz girdileri kontrol etmelidir.
+- Hata durumlarını ele almalıdır.
+- Uygun günlük kayıtları üretmelidir.
+- Ağ yetkisini doğru kullanmalıdır.
+- Bellek ve yaşam döngüsü hatalarından kaçınmalıdır.
+
+Bir sınıfın ne yaptığı belirsizse yalnızca hızlıca çalışan
+bir çözüm üretmek yerine sorumluluklarını netleştir.
+
+Projede mevcut bir sistemi değiştirirken:
+1. Önce mevcut davranışı incele.
+2. Sistemin hangi yerlerden kullanıldığını bul.
+3. Bağımlılıkları kontrol et.
+4. En küçük güvenli değişikliği yap.
+5. Etkilenen sistemleri yeniden doğrula.
+
+Kullanıcı onayı olmadan büyük çaplı yeniden yapılandırma,
+dosya silme veya projeyi yeni bir mimariye taşıma işlemi yapma.
+
+Mevcut çalışan sistemi korumak, gereksiz yere yeniden
+yazmaktan daha önemlidir.
+
+
+======================================================================
+BÖLÜM 28 — HATA YÖNETİMİ VE GELİŞTİRME GÜNLÜĞÜ
+======================================================================
+
+Hatalar açık biçimde raporlanmalıdır.
+
+Hata raporunda:
+- İşlem.
+- Beklenen sonuç.
+- Gerçekleşen sonuç.
+- İlgili dosya veya sistem.
+- Hatanın tekrarlanma koşulları.
+- Mevcut kanıt.
+- Denenen düzeltmeler.
+- Sonraki adım.
+
+bilgileri bulunmalıdır.
+
+Hata mesajlarını sessizce yutma.
+
+Boş veya geçersiz bir nesne referansı oluştuğunda kontrol
+ekle ve uygun hata kaydı üret.
+
+Bir işlem başarısız olduğunda oyunun kalan durumunu
+tutarsız bırakma.
+
+Örneğin:
+- Eşya alınamazsa dünya nesnesi korunmalıdır.
+- Kayıt başarısızsa başarılı kayıt bildirimi verilmemelidir.
+- Bağlantı kurulamazsa oyuncu bağlı gibi gösterilmemelidir.
+- Bina ilerlemesi kaydedilemezse sonraki bina tamamlanmış
+  gibi işaretlenmemelidir.
+
+GELİŞTİRME GÜNLÜĞÜ
+
+Her tamamlanan görev için şunları kaydet:
+- Görev kimliği.
+- Amaç.
+- Değiştirilen dosyalar.
+- Uygulanan özellikler.
+- Derleme sonucu.
+- Test sonuçları.
+- Bilinen hatalar.
+- Geri alma bilgisi gerekiyorsa ilgili referans.
+- Sonraki görev.
+
+Günlükte yalnızca doğrulanmış sonuçları tamamlandı olarak işaretle.
+
+Daha önce başarısız olmuş bir işlemin tekrar denenmesi
+önceki hatanın ortadan kalktığını kanıtlamaz.
+Yeni denemenin sonucunu ayrıca doğrula.
+
+
+======================================================================
+BÖLÜM 29 — OTOMATİK TESTLER VE KABUL KRİTERLERİ
+======================================================================
+
+Testler, geliştirme sürecinin ayrılmaz bir parçasıdır.
+
+Uygun yerlerde Unreal Engine otomasyon testleri, birim testleri,
+fonksiyonel testler ve manuel oynanış testleri kullan.
+
+TEST 1 — ENVANTER
+
+- Temel kapasite dört yuvadır.
+- Harita kopyası bir yuva kullanır.
+- Harita kopyası varken üç normal eşya yuvası kalır.
+- Envanter doluyken yeni eşya alma işlemi reddedilir.
+- Başarısız eşya alma işlemi dünya nesnesini yok etmez.
+- Aynı eşya iki oyuncuya birden verilmez.
+
+TEST 2 — HARİTA
+
+- Duvardaki harita kalıcıdır.
+- Harita kopyası alınması duvardaki haritayı kaldırmaz.
+- Harita kopyası envanterde doğru gösterilir.
+- Harita üzerindeki hedef bina gerçek hedefle eşleşir.
+- İlerleme güncellendiğinde harita verisi tutarlı kalır.
+
+TEST 3 — BİNA İLERLEMESİ
+
+- Her gece tek bir hedef bina vardır.
+- Diğer binaların girişleri kapalıdır.
+- Hedef bina erişilebilirdir.
+- Bina tamamlanması yalnızca geçerli koşullarda gerçekleşir.
+- Tamamlanmış bina tekrar hedef olarak seçilmez.
+- Sonraki hedef doğru belirlenir.
+
+TEST 4 — OYUN DURUMU
+
+- Gece başlangıcı bir defa çalışır.
+- Gece sonu doğru aşamaya geçer.
+- Gün sonu ödülü iki kez verilmez.
+- Kayıt yüklemesi oyun durumunu tutarlı şekilde geri getirir.
+- Geçersiz durum geçişleri reddedilir.
+
+TEST 5 — YARATIK
+
+- Yaratık geçerli hedefi algılayabilir.
+- Görüş engelleri doğru değerlendirilir.
+- Geçerli navigasyon rotası kullanılır.
+- Erişilemeyen hedef durumları ele alınır.
+- Hedef kaybedildiğinde uygun arama davranışı oluşur.
+- Tehdit sona erdiğinde takip durumu doğru güncellenir.
+
+TEST 6 — SES
+
+- Ana menü müziği doğru çalışır.
+- Yaratık sesleri doğru olaylarla ilişkilidir.
+- Kovalamaca müziği tehdit başladığında etkinleşir.
+- Oyuncu gerçekten kurtulduğunda müzik uygun şekilde azalır.
+- Aynı müzik gereksiz yere üst üste başlatılmaz.
+- Ses ayarları ilgili ses kategorilerini kontrol eder.
+
+TEST 7 — ÇOK OYUNCULU
+
+- İki istemci aynı oturuma bağlanabilir.
+- Oyuncu hareketleri diğer istemcide görünür.
+- Eşya alma işlemi tutarlıdır.
+- Envanter sınırları korunur.
+- Hedef bina ortak biçimde belirlenir.
+- Gece geçişi tutarlıdır.
+- Teslimat yalnızca bir defa işlenir.
+- Bağlantı kesilmesi uygun şekilde ele alınır.
+
+TEST 8 — KAYIT
+
+- Geçerli kayıt yüklenebilir.
+- Geçersiz kayıt güvenli şekilde reddedilir.
+- Kayıt sürümü kontrol edilir.
+- İlerleme korunur.
+- Yinelenen ödül oluşmaz.
+- Kaydetme hatası doğru raporlanır.
+
+TEST 9 — GÖRSEL VE OYNANIŞ
+
+- Oyuncu zemine düşmez.
+- Oyuncu kapalı binalara normal yoldan giremez.
+- Çarpışmalar görsel geometriyle tutarlıdır.
+- Önemli nesneler doğru görünür.
+- Etkileşim arayüzü doğru çalışır.
+- Ana menü doğru görünür.
+- Oyun paketlenmiş yapıda test edilir.
+
+Testlerden biri başarısız olduğunda:
+- Hatanın nedenini araştır.
+- İlgili sistemi düzelt.
+- Testi yeniden çalıştır.
+- Sonucu kaydet.
+
+Testi silerek, beklentiyi sebepsiz yere değiştirerek veya
+başarısızlığı rapordan çıkararak başarı elde etmeye çalışma.
+
+
+======================================================================
+BÖLÜM 30 — GÖRSEL KABUL TESTLERİ
+======================================================================
+
+Görsel kalite yalnızca öznel bir değerlendirme olarak bırakılmamalıdır.
+
+Her önemli sahne şu kriterlerle incelenir:
+
+- Ölçek tutarlılığı.
+- Geometri kalitesi.
+- Malzeme kalitesi.
+- Işıklandırma.
+- Gölge davranışı.
+- Çevresel kompozisyon.
+- Nesnelerin doğru konumlandırılması.
+- Çarpışma tutarlılığı.
+- Kamera açısından görünüm.
+- Görsel tekrarların miktarı.
+- Performans.
+
+Özellikle şu alanları ayrı ayrı değerlendir:
+- Ana menü.
+- Sığınak.
+- Şehir sokakları.
+- Hedef bina dışı.
+- Hedef bina içi.
+- Yaratıkların görüldüğü alanlar.
+- Etkileşimli nesneler.
+- Envanter arayüzü.
+- Harita arayüzü.
+
+Her sahnenin farklı bir görsel kimliği olabilir; ancak bütün
+sahneler aynı oyuna ait olduklarını hissettirmelidir.
+
+Düşük kaliteli geçici modellerin, hatalı materyallerin,
+boş odaların veya eksik ışıklandırmanın nihai sürümde
+kalmasına izin verme.
+
+Henüz tamamlanmamış bir varlık varsa bunu açıkça kaydet.
+
+
+======================================================================
+BÖLÜM 31 — KULLANICI DENEYİMİ VE ERİŞİLEBİLİRLİK
+======================================================================
+
+Oyuncu temel mekanikleri açıklamasız biçimde tahmin etmek
+zorunda kalmamalıdır.
+
+Gerekli durumlarda:
+- Kısa etkileşim açıklamaları.
+- Anlaşılır görev hedefleri.
+- Okunabilir metinler.
+- Ses seviyesi ayarları.
+- Fare hassasiyeti.
+- Görüş alanı ayarı, proje ve kamera sistemi destekliyorsa.
+- Uygun kontrast.
+- Kontrol geri bildirimi.
+
+sağlanmalıdır.
+
+Arayüz oyuncunun görüşünü gereksiz yere kapatmamalıdır.
+
+Korku atmosferi korunurken temel metinler ve önemli
+etkileşimler anlaşılabilir olmalıdır.
+
+Görsel ve işitsel ipuçları aynı anda kullanıldığında,
+birinin eksikliği temel oynanışı gereksiz biçimde
+imkânsız hâle getirmemelidir.
+
+Erişilebilirlik ayarları oyun mantığına müdahale etmemeli,
+ilgili sunum özelliklerini güvenli biçimde değiştirmelidir.
+
+
+======================================================================
+BÖLÜM 32 — SES VE GÖRSEL VARLIK ÜRETİM POLİTİKASI
+======================================================================
+
+Gerekli bir varlığın mevcut olduğunu varsayma.
+
+Her varlık için:
+- Projede mevcut olup olmadığını kontrol et.
+- Kullanılabilir referansları incele.
+- Gerçek üretim araçlarının erişilebilirliğini doğrula.
+- Gerekiyorsa yeni varlık üret.
+- Üretilen varlığı projeye doğru biçimde entegre et.
+- Sonuç kalitesini kontrol et.
+
+Üretilemeyen bir model, ses veya animasyon için sahte bir
+başarı raporu oluşturma.
+
+Harici bir varlık kullanılıyorsa:
+- Kaynağını kaydet.
+- Lisansını ve kullanım koşullarını kontrol et.
+- Projeye entegrasyonunu doğrula.
+- Eksik bağımlılıkları raporla.
+
+Görsel veya sesli içerik üretimi, yalnızca dosyanın
+oluşturulmasıyla bitmez.
+
+Dosyanın doğru biçimde içe aktarılması, doğru nesneye
+atanması, oyunda görünmesi veya duyulması ve performans
+açısından kontrol edilmesi gerekir.
+
+
+======================================================================
+BÖLÜM 33 — DERLEME, EDITÖR VE PROJE BAĞLANTISI
+======================================================================
+
+Geliştirmeye başlamadan önce Unreal Engine ile AI Game Dev
+arasındaki bağlantıyı doğrula.
+
+Önce:
+1. Proje dizinini belirle.
+2. .uproject dosyasını doğrula.
+3. Unreal Engine sürümünü belirle.
+4. Projenin mevcut kaynak dosyalarını incele.
+5. Derleme sistemini doğrula.
+6. Editör bağlantısının gerçek durumunu kontrol et.
+7. Mevcut derleme günlüklerini incele.
+
+Editör bağlantısı başarısızsa oyun özellikleri geliştirmeye
+başlamadan önce bağlantı ve derleme sorununu çöz.
+
+PRE-LAUNCH BUILD FAILED veya BUILD TIMED OUT gibi bir hata
+oluşursa:
+- Hata mesajını kaydet.
+- İlgili derleme günlüğünü incele.
+- Hatanın kaynak kodu, araç bağlantısı, süre sınırı veya
+  ortam yapılandırmasıyla ilişkisini belirle.
+- Desteklenmeyen varsayımlar üzerinden değişiklik yapma.
+- Gereksiz yere bütün projeyi yeniden oluşturma.
+
+Derleme zaman aşımı tek başına kodun hatalı olduğunu kanıtlamaz.
+Ancak derleme tamamlanmadan projenin başarılı olduğunu
+da kanıtlamaz.
+
+Gerekli araç mevcut değilse bu engeli açıkça raporla.
+
+Derleme başarılı olduktan sonra editörün projeyi gerçekten
+açtığını ve ilgili sahnenin yüklenebildiğini doğrula.
+
+
+======================================================================
+BÖLÜM 34 — PAKETLEME VE SON KULLANICI TESTİ
+======================================================================
+
+Editörde çalışan oyun, paketlenmiş oyunun da doğru çalıştığını
+tek başına kanıtlamaz.
+
+Paketleme aşamasında:
+- Eksik varlıklar kontrol edilir.
+- Gerekli eklentiler doğrulanır.
+- Haritalar ve içerikler paketlemeye dâhil edilir.
+- Gerekli yapılandırmalar kontrol edilir.
+- Paketleme hataları kaydedilir.
+- Paketlenmiş oyun çalıştırılır.
+
+Paketlenmiş yapıda:
+- Ana menü açılmalıdır.
+- Oyuncu oyuna başlayabilmelidir.
+- Karakter hareket etmelidir.
+- Sığınak erişilebilir olmalıdır.
+- Harita çalışmalıdır.
+- Envanter çalışmalıdır.
+- Hedef bina erişilebilir olmalıdır.
+- Eşya alma ve teslim etme çalışmalıdır.
+- Yaratık davranışları çalışmalıdır.
+- Ses geçişleri doğru çalışmalıdır.
+- Çok oyunculu bağlantı test edilebilmelidir.
+- Kayıt ve yükleme doğrulanmalıdır.
+
+Paketlenmiş oyunda eksik bir özelliği editörün çalışmasıyla
+başarılı sayma.
+
+Paketleme başarısızsa ilgili hata giderilmeden nihai
+sürümün tamamlandığını bildirme.
+
+
+======================================================================
+BÖLÜM 35 — GELİŞTİRME AŞAMALARI VE KAPI KONTROLLERİ
+======================================================================
+
+Geliştirme aşamalı olarak yürütülmelidir.
+
+Her aşama bir sonraki aşamaya geçiş için kabul kriterlerine
+sahip olmalıdır.
+
+AŞAMA 0 — PROJE VE ARAÇ DOĞRULAMA
+
+Görevler:
+- Projeyi incele.
+- Unreal sürümünü doğrula.
+- Editör bağlantısını doğrula.
+- Derleme sürecini doğrula.
+- Dosya erişimini doğrula.
+- Mevcut proje yapısını belgele.
+
+Kabul kriteri:
+Proje güvenilir biçimde açılabiliyor ve küçük bir doğrulama
+görevi derlenip çalıştırılabiliyor olmalıdır.
+
+AŞAMA 1 — TEMEL KARAKTER
+
+Görevler:
+- Birinci şahıs karakteri.
+- Kamera.
+- Hareket.
+- Çarpışma.
+- Temel etkileşim altyapısı.
+
+Kabul kriteri:
+Karakter test sahnesinde güvenilir biçimde hareket edebilmelidir.
+
+AŞAMA 2 — İKİ OYUNCULU PROTOTİP
+
+Görevler:
+- Oturum oluşturma.
+- İstemci bağlantısı.
+- Oyuncu hareketinin çoğaltılması.
+- Yetkili oyun mantığı.
+- Basit eşya alma testi.
+
+Kabul kriteri:
+İki ayrı istemci aynı dünyada çalışmalı ve temel oyun
+durumları tutarlı olmalıdır.
+
+AŞAMA 3 — TEMEL ENVANTER VE HARİTA
+
+Görevler:
+- Dört yuvalı envanter.
+- Eşya veri yapıları.
+- Kalıcı duvar haritası.
+- Taşınabilir harita kopyası.
+- Harita ve hedef bina ilişkisi.
+
+Kabul kriteri:
+Envanter sınırları ve harita kuralları test edilmelidir.
+
+AŞAMA 4 — SIĞINAK VE TEK HEDEF BİNA
+
+Görevler:
+- Sığınak.
+- Şehirden sığınağa çıkış.
+- Tek hedef bina.
+- Kapalı diğer binalar.
+- Bina içi temel keşif.
+
+Kabul kriteri:
+Oyuncu sığınaktan çıkarak hedef binaya gidebilmeli
+ve geri dönebilmelidir.
+
+AŞAMA 5 — TEMEL OYNANIŞ DÖNGÜSÜ
+
+Görevler:
+- Eşya toplama.
+- Görev hedefleri.
+- Geri dönüş.
+- Teslimat.
+- Ekonomik hesaplama.
+- Gün sonu.
+- Sonraki hedef bina.
+
+Kabul kriteri:
+Bir gece baştan sona tamamlanabilmeli ve ilerleme doğru
+biçimde güncellenmelidir.
+
+AŞAMA 6 — YARATIK VE KORKU
+
+Görevler:
+- Yaratık modeli.
+- Hareket ve animasyon.
+- Algılama.
+- Takip.
+- Saklanma kuralları.
+- Tehditten kurtulma.
+- İlgili sesler.
+
+Kabul kriteri:
+Yaratıklar test edilebilir ve tutarlı davranışlar
+sergilemelidir.
+
+AŞAMA 7 — KAYIT VE YÜKLEME
+
+Görevler:
+- Kayıt biçimi.
+- Veri doğrulama.
+- Güvenli kaydetme.
+- Yükleme.
+- Yinelenen ödüllerin önlenmesi.
+
+Kabul kriteri:
+Geçerli ilerleme korunmalı ve kayıt hataları güvenli
+biçimde ele alınmalıdır.
+
+AŞAMA 8 — SANAT VE SES KALİTESİ
+
+Görevler:
+- Nihai modeller.
+- Materyaller.
+- Işıklandırma.
+- Çevresel ayrıntılar.
+- Ana menü.
+- Arayüz.
+- Müzik.
+- Ses geçişleri.
+- Animasyon iyileştirmeleri.
+
+Kabul kriteri:
+Temel oynanışta kullanılan sahneler görsel ve işitsel
+kalite hedeflerini karşılamalıdır.
+
+AŞAMA 9 — PAKETLEME VE SON TESTLER
+
+Görevler:
+- Derleme.
+- Paketleme.
+- İki oyunculu test.
+- Kayıt testi.
+- Performans testi.
+- Kritik hata düzeltmeleri.
+
+Kabul kriteri:
+Paketlenmiş oyun baştan sona oynanabilmeli ve kritik
+hatalar bulunmamalıdır.
+
+Aşamaların sırası teknik bağımlılıklar nedeniyle değişirse
+değişiklik belgelenmelidir.
+
+Bir aşamanın kabul kriterleri karşılanmadan sonraki aşamaya
+geçilmemelidir.
+
+
+======================================================================
+BÖLÜM 36 — GÖREV YÜRÜTME PROTOKOLÜ
+======================================================================
+
+Her geliştirme görevi küçük, doğrulanabilir ve açık
+bir kapsama sahip olmalıdır.
+
+Bir görevi yürütürken şu sırayı kullan:
+
+1. Mevcut durumu incele.
+2. Görevin amacını tanımla.
+3. Ön koşulları kontrol et.
+4. İlgili dosyaları belirle.
+5. Değişiklik kapsamını belirle.
+6. Uygulamayı gerçekleştir.
+7. Derleme veya uygun doğrulama işlemini yap.
+8. İlgili testleri çalıştır.
+9. Etkilenen sistemleri kontrol et.
+10. Sonuçları günlüğe kaydet.
+11. Görevi tamamlandı, kısmen tamamlandı veya engellendi
+    şeklinde sınıflandır.
+12. Sonraki en küçük uygun görevi belirle.
+
+BİR GÖREVİN KAPSAMI
+
+Her görev için:
+- Amaç.
+- Ön koşullar.
+- Değiştirilecek dosyalar.
+- Beklenen davranış.
+- Kabul kriterleri.
+- Test planı.
+- Başarısızlık durumunda izlenecek yol.
+
+belirlenmelidir.
+
+Bir görev birden fazla bağımsız sistemi kapsıyorsa görevleri
+küçült.
+
+Örneğin:
+"Envanter, yaratık AI, kayıt ve ses sistemini tamamla"
+geçerli bir tek görev değildir.
+
+Bunun yerine:
+"Envanterde eşya alma işleminin yetkili oyun tarafında
+doğrulanmasını ve kapasite aşımının engellenmesini uygula"
+gibi doğrulanabilir bir görev oluştur.
+
+ÇALIŞAN SİSTEMLERİN KORUNMASI
+
+Mevcut çalışan sistemleri gereksiz yere yeniden yazma.
+
+Değişiklik öncesi ve sonrasında ilgili davranışları doğrula.
+
+Büyük değişiklikler gerekiyorsa:
+- Gerekçesini açıkla.
+- Etkilenen sistemleri belirle.
+- Geri alma yolunu hazırla.
+- İlgili testleri yeniden çalıştır.
+
+Bir görevin başarısız olması durumunda:
+- Başarısızlığı kaydet.
+- Hatanın kaynağını araştır.
+- Gerekirse görevi daha küçük parçalara ayır.
+- Çalışan özellikleri koru.
+- Başarı iddiasında bulunma.
+
+Araçların yetenekleri dışında kalan bir işlemi gerçekleştirmiş
+gibi raporlama.
+
+
+======================================================================
+BÖLÜM 37 — TAMAMLANMA RAPORU VE KALİTE GÜVENCESİ
+======================================================================
+
+Her görev sonunda şu raporu üret:
+
+GÖREV:
+Görevin kısa adı.
+
+AMAÇ:
+Gerçekleştirilmesi gereken davranış.
+
+DEĞİŞTİRİLEN DOSYALAR:
+Oluşturulan, değiştirilen veya silinen dosyalar.
+
+UYGULANAN ÖZELLİKLER:
+Gerçekte uygulanan davranışlar.
+
+DERLEME:
+Başarılı, başarısız veya doğrulanamadı.
+
+TESTLER:
+Gerçekleştirilen testler ve sonuçları.
+
+BİLİNEN HATALAR:
+Çözülmemiş sorunlar ve sınırlamalar.
+
+KABUL KRİTERLERİ:
+Her kriterin karşılanıp karşılanmadığı.
+
+DURUM:
+- Tamamlandı.
+- Kısmen tamamlandı.
+- Engellendi.
+- Başarısız.
+
+SONRAKİ GÖREV:
+Bağımlılıklara göre belirlenen en küçük uygun görev.
+
+Bir test gerçekten çalıştırılmadıysa sonucunu başarılı olarak
+gösterme.
+
+Derleme başarılı olsa bile oynanış testi yapılmadıysa
+oynanışın doğrulandığını iddia etme.
+
+Bir özellik yalnızca kısmen uygulandıysa tamamlandı olarak
+işaretleme.
+
+Tamamlanma raporu gerçek dosyalara, gerçek testlere ve
+gerçek gözlemlere dayanmalıdır.
+
+
+======================================================================
+BÖLÜM 38 — SON ÜRÜN KABUL KRİTERLERİ
+======================================================================
+
+GRAVE SHIFT aşağıdaki koşullar karşılanmadan tamamlanmış
+kabul edilmemelidir.
+
+OYUN TASARIMI
+
+- Temel oyun döngüsü baştan sona çalışır.
+- Her gece yalnızca bir hedef bina bulunur.
+- Diğer binaların girişleri tahtalarla kapalıdır.
+- Bina ilerlemesi belirlenen sıraya göre çalışır.
+- Sığınak işlevseldir.
+- Kalıcı duvar haritası çalışır.
+- Harita kopyası envanterde bir yuva kullanır.
+- Dört yuvalı envanter doğru çalışır.
+- Görev ve teslimat kuralları tutarlıdır.
+
+OYUNCU DENEYİMİ
+
+- Karakter hareketi doğrudur.
+- Etkileşimler çalışır.
+- Envanter anlaşılırdır.
+- Harita okunabilirdir.
+- Oyuncu hedef binayı belirleyebilir.
+- Oyuncu binaya ulaşabilir ve geri dönebilir.
+- Oyun durumları arasında geçişler tutarlıdır.
+
+YARATIKLAR
+
+- Algılama sistemi çalışır.
+- Takip davranışı çalışır.
+- Navigasyon sorunları ele alınır.
+- Saklanma kuralları tutarlıdır.
+- Tehditten kurtulma davranışı doğrudur.
+- Sesler ve animasyonlar oyun durumlarıyla uyumludur.
+
+ÇOK OYUNCULU
+
+- İki oyuncu aynı oturumda oynayabilir.
+- Ortak oyun durumu tutarlıdır.
+- Envanter ve eşya sahipliği korunur.
+- Görev ve ödüller çoğaltılmaz.
+- Bağlantı hataları güvenli biçimde ele alınır.
+- Gerçekten test edilen ağ senaryoları belgelenir.
+
+KAYIT
+
+- İlerleme güvenilir biçimde kaydedilir.
+- Kayıt yüklenebilir.
+- Geçersiz kayıtlar güvenli biçimde ele alınır.
+- Yinelenen ödül oluşmaz.
+- Sürüm uyuşmazlıkları raporlanır.
+
+GÖRSEL KALİTE
+
+- Önemli 3B varlıklar tamamlanmıştır.
+- Geçici şekiller nihai sanat olarak bırakılmamıştır.
+- Şehir ve bina tasarımı tutarlıdır.
+- Sığınak ayrıntılıdır.
+- Materyaller doğru çalışır.
+- Işıklandırma atmosferi destekler.
+- Ana menü tamamlanmıştır.
+- Arayüz profesyonel bir tasarım sistemine sahiptir.
+
+SES
+
+- Ortam sesleri çalışır.
+- Yaratık sesleri çalışır.
+- Menü müziği çalışır.
+- Kovalamaca müziği tehdit durumuyla uyumludur.
+- Tehdit sona erdiğinde uygun ses geçişi gerçekleşir.
+- Ses ayarları çalışır.
+
+TEKNİK KALİTE
+
+- Proje derlenebilir.
+- Editör projeyi açabilir.
+- Paketlenmiş oyun çalışır.
+- Kritik çalışma zamanı hataları giderilmiştir.
+- Temel performans testleri yapılmıştır.
+- Otomatik testler ve manuel testler belgelenmiştir.
+
+Bir kabul kriteri doğrulanmadıysa açıkça belirtilmelidir.
+Doğrulanmamış bir özellik, tamamlanmış bir özellik değildir.
+
+
+======================================================================
+BÖLÜM 39 — ÜRETİM SINIRLARI VE TEKNİK ENGELLER
+======================================================================
+
+AI Game Dev'nin erişebildiği araçlar ve Unreal Editor
+entegrasyonu önceden doğrulanmalıdır.
+
+Şu işlemler destekleniyorsa kullanılabilir:
+- Dosya inceleme.
+- Kod üretimi.
+- Kod düzenleme.
+- Derleme.
+- Unreal Editor kontrolü.
+- Varlık üretimi.
+- Otomatik test.
+- Paketleme.
+
+Ancak bu işlemlerin her birinin mevcut ortamda gerçekten
+erişilebilir olup olmadığı kontrol edilmelidir.
+
+Bir araç bulunmuyorsa:
+- Aracın eksik olduğunu bildir.
+- Bağımlılığı belgeleyerek alternatif çözümü değerlendir.
+- Gereksiz sistem değişikliklerinden kaçın.
+- İlgili görevi engellenmiş olarak işaretle.
+
+İşletim sistemi veya motor sürümüyle uyumsuz bir komutu
+tekrar tekrar çalıştırma.
+
+Derleme hatası varsa:
+1. Hata mesajını incele.
+2. İlgili günlükleri oku.
+3. İlk gerçek hata kaynağını belirle.
+4. Küçük bir düzeltme yap.
+5. Yeniden derle.
+6. Sonucu doğrula.
+
+Hata kaynağı belirlenmeden büyük çaplı kod değişikliği yapma.
+
+Proje bağlantısı başarısızsa önce bağlantıyı ve derleme
+ortamını doğrula.
+
+Başarısız araç çağrılarını gizleme veya işlemin başarılı
+olduğunu iddia etme.
+
+
+======================================================================
+BÖLÜM 40 — GELİŞTİRMEYE BAŞLAMA TALİMATI
+======================================================================
+
+ŞİMDİ GELİŞTİRMEYE BAŞLA.
+
+Ancak ilk görevin bütün oyunu üretmek değildir.
+
+İLK GÖREV: MEVCUT PROJENİN TEKNİK DENETİMİ
+
+Aşağıdakileri sırayla gerçekleştir:
+
+1. Mevcut Unreal Engine projesini bul.
+2. .uproject dosyasını incele.
+3. Motor sürümünü belirle.
+4. Mevcut klasör yapısını incele.
+5. Var olan oyun sınıflarını ve sistemlerini belirle.
+6. Kullanılan eklentileri ve gerekli bağımlılıkları kontrol et.
+7. AI Game Dev ile editör arasındaki bağlantıyı doğrula.
+8. Projenin derlenebilirliğini kontrol et.
+9. Mevcut hataları ve eksik bağımlılıkları raporla.
+10. İlk geliştirme aşamasına geçiş için gerekli koşulları
+    doğrula.
+
+İlk görev sırasında çalışan sistemleri yeniden yazma.
+Önce mevcut durumun doğru bir fotoğrafını çıkar.
+
+Teknik denetim başarılıysa ikinci görevi belirle:
+Birinci şahıs karakterin hareket ettiği, kameranın çalıştığı
+ve temel etkileşimin test edilebildiği küçük bir prototip.
+
+İkinci görev doğrulanmadan bütün şehir, yaratıklar, sesler,
+envanter, ekonomi ve diğer sistemleri aynı anda üretmeye başlama.
+
+Her görevde:
+- Mevcut projeyi koru.
+- Gereksinimleri uygula.
+- Küçük ve doğrulanabilir değişiklikler yap.
+- Testleri çalıştır.
+- Sonuçları kaydet.
+- Bir sonraki görevi belirle.
+
+Kullanıcıya yalnızca tamamlanan işi değil, tamamlanamayan
+işleri ve teknik engelleri de açıkça bildir.
+
+======================================================================
+SON TALİMAT
+======================================================================
+
+GRAVE SHIFT'in hedefi, yalnızca güzel görünen bir Unreal Engine
+sahnesi veya birbirinden kopuk mekaniklerden oluşan bir prototip
+üretmek değildir.
+
+Hedef; tutarlı bir dünya, anlamlı oyuncu kararları, güvenilir
+oyun sistemleri, çalışır çok oyunculu altyapı, güçlü korku
+atmosferi, profesyonel görsel kalite ve doğrulanmış bir
+oynanış döngüsüne sahip bir oyun geliştirmektir.
+
+Tasarım bütünlüğünü koru.
+Teknik doğruluğu koru.
+Görsel kaliteyi ihmal etme.
+Çalışan sistemleri koru.
+Test edilmemiş özellikleri başarılı olarak sunma.
+Gerçekleştirilemeyen işleri gizleme.
+Bağımlılıkları doğrulamadan varsayım yapma.
+Görevleri küçük ve ölçülebilir parçalara ayır.
+Her aşamanın sonuçlarını doğrulamadan sonraki aşamaya geçme.
+
+Önce mevcut projeyi incele ve teknik denetim raporunu oluştur.
+Ardından yalnızca ilk doğrulanabilir geliştirme görevini
+uygula.
+
+Bütün oyunu tek seferde oluşturmaya çalışma.
+Profesyonel bir oyun, birbiriyle uyumlu çalışan ve test edilmiş
+sistemlerin aşamalı biçimde birleştirilmesiyle geliştirilir.
+======================================================================
